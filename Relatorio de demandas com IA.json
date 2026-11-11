@@ -1,0 +1,181 @@
+{
+  "name": "Relatorio de demandas com IA",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d0791594-388c-4902-9ad4-62932e780510",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1k3-RaDIh-ex9m6-RcauA9yEiSC7ESgMEsAXHVAiUYOc",
+          "mode": "list",
+          "cachedResultName": "demandas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k3-RaDIh-ex9m6-RcauA9yEiSC7ESgMEsAXHVAiUYOc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 311093817,
+          "mode": "list",
+          "cachedResultName": "demandas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k3-RaDIh-ex9m6-RcauA9yEiSC7ESgMEsAXHVAiUYOc/edit#gid=311093817"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d99b2347-3b3b-411d-b62a-7c4af10ae7ed",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5GNrZXSrlI0sehmi",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const itens = $input.all().map(i => i.json);\n\nconst DIA = 24 * 60 * 60 * 1000;\nconst paraMs = (iso) => Date.parse(iso + 'T00:00:00Z');\nconst agora = new Date();\nconst hoje = Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth(), agora.getUTCDate());\nconst dias = (de, ate) => Math.round((ate - de) / DIA);\n\nconst media = (nums) =>\n  nums.length ? Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 10) / 10 : null;\n\nconst contar = (lista, campo) =>\n  lista.reduce((acc, d) => {\n    acc[d[campo]] = (acc[d[campo]] || 0) + 1;\n    return acc;\n  }, {});\n\nconst resolvidas = itens.filter(d => d.status === 'Resolvida' && d.data_resolucao);\nconst emAberto = itens.filter(d => d.status !== 'Resolvida');\n\nconst tempoResolucao = (d) => dias(paraMs(d.data_abertura), paraMs(d.data_resolucao));\n\nconst porSistema = [...new Set(itens.map(d => d.sistema))]\n  .map(nome => {\n    const doSistema = itens.filter(d => d.sistema === nome);\n    const abertas = doSistema.filter(d => d.status !== 'Resolvida');\n    const resolvidasDoSistema = doSistema.filter(d => d.status === 'Resolvida' && d.data_resolucao);\n    return {\n      sistema: nome,\n      total: doSistema.length,\n      em_aberto: abertas.length,\n      alta_em_aberto: abertas.filter(d => d.prioridade === 'Alta').length,\n      tempo_medio_resolucao_dias: media(resolvidasDoSistema.map(tempoResolucao)),\n    };\n  })\n  .sort((a, b) => b.total - a.total);\n\nconst criticas = emAberto\n  .filter(d => d.prioridade === 'Alta')\n  .map(d => ({\n    numero: d.numero,\n    sistema: d.sistema,\n    descricao: d.descricao,\n    status: d.status,\n    dias_em_aberto: dias(paraMs(d.data_abertura), hoje),\n  }))\n  .filter(d => d.dias_em_aberto > 7)\n  .sort((a, b) => b.dias_em_aberto - a.dias_em_aberto);\n\nreturn [{\n  json: {\n    data_relatorio: new Date(hoje).toISOString().slice(0, 10),\n    total_demandas: itens.length,\n        alta_prioridade_em_aberto: emAberto.filter(d => d.prioridade === 'Alta').length,\n    por_status: contar(itens, 'status'),\n    por_prioridade: contar(itens, 'prioridade'),\n    tempo_medio_resolucao_dias: media(resolvidas.map(tempoResolucao)),\n    por_sistema: porSistema,\n    alta_prioridade_parada_mais_de_7_dias: criticas,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "bf28c305-5685-43f4-8098-a04a3b98c094",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Você é um analista de suporte de TI escrevendo o relatório semanal de demandas para o gestor da área. Use APENAS os dados em JSON abaixo.\n\nRegras:\n- Não invente números, causas ou riscos. Qualquer causa ou risco deve vir marcado como \"hipótese\" e ser coerente com os números.\n- Cite cada demanda no formato \"DEM-016 (17 dias)\", sem barras.\n- Escreva datas como dd/mm/aaaa e decimais com vírgula.\n- Não escreva a data do relatório no texto.\n- Nas recomendações, não sugira realocar equipe, criar SLA nem mudar processos. Recomende apenas escalonar, priorizar e acompanhar as demandas ou sistemas citados nos pontos de atenção.\n- Escreva em português, em texto simples (sem markdown, sem asteriscos, sem tabelas), com no máximo 150 palavras.\n- Ao citar status, use os nomes exatos: Aberta, Em andamento e Resolvida. Use \"em aberto\" apenas para Aberta mais Em andamento, e nunca use \"não resolvidas\".\n\nEstrutura:\n1) Resumo: 2 frases com a situação geral.\n2) Pontos de atenção: 3 padrões por sistema (por exemplo, um sistema com todas as demandas em aberto, ou com várias de prioridade Alta paradas há mais de 7 dias), com números e no máximo 2 demandas de exemplo por ponto. Não liste apenas as demandas mais antigas.\n3) Recomendações: 3 ações de priorização, ligadas aos pontos de atenção.\n- Não use a palavra \"bloqueios\" nem outras causas que os dados não mostram.\n- Use \"não resolvidas\" para demandas abertas mais em andamento, e \"com status Aberta\" apenas para o status.\n\nDados:\n{{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "c23687ae-47b6-4b7b-86c4-56cb0ad8039e",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "matheusatec@gmail.com",
+        "subject": "=Relatório de demandas - {{ $('Code in JavaScript').item.json.data_relatorio }}",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "ea68a1e4-76a4-4beb-bf7f-028ade0ad028",
+      "name": "Send a message",
+      "webhookId": "a780794a-640d-49cd-bcb5-83f33f568c5b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GOOdlFmIPkCGdYTT",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "eaef3b17-6824-4f0e-8afe-ba4c287ee79a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5fc875052993c2cd344eb8fc49c1f02a2ea665b1db5685e7a2d12176ef8e1aea"
+  },
+  "nodeGroups": [],
+  "id": "sith07nsXMLGhIYO",
+  "tags": []
+}
