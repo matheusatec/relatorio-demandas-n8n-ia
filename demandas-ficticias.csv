@@ -1,0 +1,26 @@
+numero,solicitante,setor,sistema,descricao,prioridade,status,data_abertura,data_resolucao
+DEM-001,Helena Duarte,Financeiro,Protocolo,Protocolo não gera número de recibo para anexos em PDF,Alta,Aberta,2026-10-30,
+DEM-002,Rafael Cordeiro,Recursos Humanos,Folha de Pagamento,Cálculo de horas extras divergente no fechamento de outubro,Alta,Em andamento,2026-11-02,
+DEM-003,Beatriz Nogueira,Operações,Compras,Pedido de compra fica preso na etapa de aprovação,Média,Resolvida,2026-10-22,2026-10-26
+DEM-004,Tiago Albuquerque,Comercial,Contabilidade,Relatório de conciliação não exporta para Excel,Baixa,Resolvida,2026-10-27,2026-11-02
+DEM-005,Larissa Vieira,Jurídico,Tributos,Guia de imposto com código de barras inválido,Alta,Aberta,2026-11-08,
+DEM-006,Marcos Pinheiro,Atendimento,Protocolo,Busca de processos não retorna resultados com CPF formatado,Média,Resolvida,2026-11-03,2026-11-05
+DEM-007,Camila Teixeira,Financeiro,Folha de Pagamento,Holerite não disponível para download no portal,Média,Em andamento,2026-11-06,
+DEM-008,Eduardo Macedo,Operações,Protocolo,Histórico de tramitação exibe movimentações duplicadas,Baixa,Aberta,2026-10-24,
+DEM-009,Patrícia Lacerda,Recursos Humanos,Contabilidade,Lançamento de provisão com centro de custo incorreto,Alta,Resolvida,2026-10-17,2026-10-27
+DEM-010,Gustavo Ramalho,Comercial,Tributos,Alíquota de ISS não aplicada em notas de serviço,Alta,Em andamento,2026-10-28,
+DEM-011,Juliana Prado,Atendimento,Protocolo,Lentidão ao abrir a lista de protocolos da filial,Média,Aberta,2026-11-09,
+DEM-012,Henrique Batista,Financeiro,Contabilidade,Plano de contas sem permissão de edição para a equipe,Baixa,Resolvida,2026-10-12,2026-10-24
+DEM-013,Fernanda Lopes,Operações,Folha de Pagamento,Descontos de vale-transporte não aparecem na simulação,Alta,Aberta,2026-11-01,
+DEM-014,Diego Carvalho,Jurídico,Protocolo,Processo anexado com versão antiga do modelo de documento,Baixa,Resolvida,2026-11-04,2026-11-07
+DEM-015,Renata Moura,Comercial,Protocolo,Protocolo de entrada sem campo para unidade remetente,Média,Aberta,2026-11-05,
+DEM-016,Lucas Fontana,Recursos Humanos,Folha de Pagamento,Retenção de INSS calculada sobre o valor bruto para RPA,Alta,Em andamento,2026-10-25,
+DEM-017,Vanessa Brito,Atendimento,Contabilidade,Exportação do balancete sem linha de totalizadores,Média,Resolvida,2026-10-31,2026-11-05
+DEM-018,Otávio Sampaio,Financeiro,Compras,Limite de aprovação não respeita a alçada do gestor,Alta,Resolvida,2026-10-20,2026-10-28
+DEM-019,Carla Mendes,Operações,Protocolo,Relatório de protocolos não agrupa por competência,Média,Em andamento,2026-11-07,
+DEM-020,Bruno Serra,Comercial,Folha de Pagamento,Reajuste salarial não replica no cenário simulado,Baixa,Resolvida,2026-10-29,2026-10-30
+DEM-021,Simone Araújo,Jurídico,Protocolo,Tramitação sem registro da data de ciência,Alta,Aberta,2026-11-03,
+DEM-022,Leandro Viana,Atendimento,Compras,Ordem de compra sem campo de centro de custo,Média,Aberta,2026-11-10,
+DEM-023,Priscila Campos,Recursos Humanos,Folha de Pagamento,Rubrica de adicional noturno com percentual fixo,Alta,Resolvida,2026-10-23,2026-10-30
+DEM-024,Rodrigo Esteves,Financeiro,Tributos,DARF gerada com competência do mês anterior,Alta,Aberta,2026-10-02,
+DEM-025,Melissa Tavares,Operações,Contabilidade,Integração de notas fiscais atrasada desde ontem,Média,Em andamento,2026-11-10,
